@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="mytemp-container">
+        <h1 class="mytemp-title">温度グラフ</h1>
+        <div class="mytemp-chart-wrapper">
+            <canvas id="mytemp-chart" class="mytemp-chart"></canvas>
+        </div>
+        <div class="mytemp-info" id="mytemp-info">
+            データを読み込み中...
+        </div>
+        <div class="mytemp-info mytemp-table" id="mytemp-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>時間</th>
+                        <th>温度 (°C)</th>
+                    </tr>
+                </thead>
+                <tbody id="mytemp-table-body">
+                    <!-- テーブルの内容はJavaScriptで動的に生成 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <style>
+        .mytemp-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .mytemp-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .mytemp-chart-wrapper {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .mytemp-chart {
+            max-width: 100%;
+            height: 400px;
+        }
+
+        .mytemp-info {
+            text-align: center;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            color: #666;
+        }
+
+        .mytemp-table {
+            margin-top: 20px;
+        }
+
+        .mytemp-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mytemp-table th,
+        .mytemp-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 24px;
+        }
+
+        .mytemp-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .mytemp-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .mytemp-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 1時間おきの行のスタイル */
+        .mytemp-table tr.hour-mark {
+            border-top: 3px solid #007bff;
+            background-color: #f8f9ff;
+        }
+
+        .mytemp-table tr.hour-mark td {
+            font-weight: bold;
+            color: #0056b3;
+        }
+
+        .mytemp-table tr.hour-mark:hover {
+            background-color: #e6f3ff;
+        }
+
+        body {
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        async function loadTemperatureData(json) {
+            var json = {"temperatures":[ {"time": 1747839655280, "temp": 21.3}, {"time": 1747840255348, "temp": 21.1}, {"time": 1747840855305, "temp": 21.1}, {"time": 1747841455600, "temp": 20.8}, {"time": 1747842065819, "temp": 20.2}, {"time": 1747842655222, "temp": 20.8}, {"time": 1747843255788, "temp": 20.7}, {"time": 1747843855274, "temp": 20.6}, {"time": 1747844455356, "temp": 20.7}, {"time": 1747845060319, "temp": 20.3}, {"time": 1747845655434, "temp": 20.2}, {"time": 1747846255346, "temp": 20.1}, {"time": 1747847420887, "temp": 20.1}, {"time": 1747848020718, "temp": 20.3}, {"time": 1747848620938, "temp": 20.3}, {"time": 1747849220886, "temp": 20.2}, {"time": 1747849825831, "temp": 20.1}, {"time": 1747850421197, "temp": 19.0}, {"time": 1747854021707, "temp": 20.3}, {"time": 1747855226159, "temp": 20.3}, {"time": 1747855821189, "temp": 20.4}, {"time": 1747856421109, "temp": 20.2}, {"time": 1747857021195, "temp": 19.0}, {"time": 1747857621187, "temp": 20.3}, {"time": 1747858226159, "temp": 20.2}, {"time": 1747858821105, "temp": 20.1}, {"time": 1747859421198, "temp": 19.9}, {"time": 1747860021834, "temp": 20.0}, {"time": 1747860621126, "temp": 19.0}, {"time": 1747861226559, "temp": 20.0}, {"time": 1747861821614, "temp": 20.2}, {"time": 1747862421553, "temp": 20.6}, {"time": 1747863627169, "temp": 21.2}, {"time": 1747864221594, "temp": 21.4}, {"time": 1747864821708, "temp": 21.3}, {"time": 1747866027430, "temp": 21.0}, {"time": 1747867823020, "temp": 22.7}, {"time": 1747869027889, "temp": 22.6}, {"time": 1747869622879, "temp": 22.3}, {"time": 1747870222786, "temp": 22.8}, {"time": 1747870822865, "temp": 23.6}, {"time": 1747871423495, "temp": 24.0}, {"time": 1747872022796, "temp": 23.6}, {"time": 1747872622956, "temp": 23.4}, {"time": 1747874423040, "temp": 25.0}, {"time": 1747875624010, "temp": 25.0}, {"time": 1747876228185, "temp": 26.9}, {"time": 1747877429618, "temp": 28.2}, {"time": 1747878628552, "temp": 29.0}, {"time": 1747879223834, "temp": 32.0}, {"time": 1747879823273, "temp": 36.5}, {"time": 1747880423271, "temp": 38.7}, {"time": 1747881023190, "temp": 39.7}, {"time": 1747881628311, "temp": 39.0}, {"time": 1747882223432, "temp": 38.2}, {"time": 1747882823367, "temp": 36.6}, {"time": 1747883424311, "temp": 37.7}, {"time": 1747884024397, "temp": 37.1}, {"time": 1747884630306, "temp": 37.3}, {"time": 1747885225350, "temp": 37.8}, {"time": 1747885825385, "temp": 37.4}, {"time": 1747886425262, "temp": 37.0}, {"time": 1747887025270, "temp": 36.0}, {"time": 1747887630394, "temp": 38.5}, {"time": 1747888225346, "temp": 38.9}, {"time": 1747888826304, "temp": 38.2}, {"time": 1747889425431, "temp": 38.9}, {"time": 1747890025355, "temp": 39.7}, {"time": 1747890630387, "temp": 40.3}, {"time": 1747891225440, "temp": 40.0}, {"time": 1747891825437, "temp": 40.1}, {"time": 1747892425446, "temp": 39.8}, {"time": 1747893025342, "temp": 38.9}, {"time": 1747893630501, "temp": 38.5}, {"time": 1747894225426, "temp": 38.4}, {"time": 1747894825422, "temp": 39.5}, {"time": 1747895425639, "temp": 39.4}, {"time": 1747896025441, "temp": 38.0}, {"time": 1747896630538, "temp": 39.0}, {"time": 1747897225519, "temp": 37.4}, {"time": 1747897825514, "temp": 36.4}, {"time": 1747898425504, "temp": 36.1}, {"time": 1747899026096, "temp": 36.2}, {"time": 1747899630779, "temp": 35.8}, {"time": 1747900226307, "temp": 35.6}, {"time": 1747900825508, "temp": 35.1}, {"time": 1747901425508, "temp": 34.3}, {"time": 1747902025825, "temp": 33.1}, {"time": 1747902630546, "temp": 33.2}, {"time": 1747903831044, "temp": 30.0}, {"time": 1747912828974, "temp": 21.9}, {"time": 1747924838754, "temp": 19.4}, {"time": 1747927228509, "temp": 18.6}, {"time": 1747928444518, "temp": 18.6}, {"time": 1747929628780, "temp": 18.5}, {"time": 1747938232485, "temp": 18.8}, {"time": 1747940031583, "temp": 18.6}, {"time": 1747940631665, "temp": 18.1}, {"time": 1747941237425, "temp": 18.9}, {"time": 1747942440629, "temp": 18.9}, {"time": 1747943036707, "temp": 17.9}, {"time": 1747943631749, "temp": 18.7}, {"time": 1747944231839, "temp": 18.5}, {"time": 1747945437757, "temp": 18.4}, {"time": 1747946031993, "temp": 18.6}, {"time": 1747946631916, "temp": 19.4}, {"time": 1747947236960, "temp": 19.1}, {"time": 1747947831988, "temp": 18.9}, {"time": 1747948431986, "temp": 18.8}, {"time": 1747949032386, "temp": 19.2}, {"time": 1747949632000, "temp": 19.4}, {"time": 1747950237190, "temp": 19.4}, {"time": 1747950832068, "temp": 20.0}, {"time": 1747951431907, "temp": 21.3}, {"time": 1747952031903, "temp": 21.2}, {"time": 1747952632568, "temp": 21.1}, {"time": 1747954443812, "temp": 23.1}, {"time": 1747961033906, "temp": 32.4}, {"time": 1747961639059, "temp": 33.8}, {"time": 1747962233981, "temp": 34.6}, {"time": 1747962834227, "temp": 34.7}, {"time": 1747963440085, "temp": 35.1}, {"time": 1747964033911, "temp": 34.8}, {"time": 1747964638867, "temp": 35.7}, {"time": 1747965233997, "temp": 36.7}, {"time": 1747965833907, "temp": 36.3}, {"time": 1747966433932, "temp": 36.7}, {"time": 1747967034317, "temp": 35.0}, {"time": 1747967638954, "temp": 36.5}, {"time": 1747968233908, "temp": 37.8}, {"time": 1747968833908, "temp": 37.3}, {"time": 1747969433834, "temp": 36.2}, {"time": 1747970033917, "temp": 36.6}, {"time": 1747970638873, "temp": 37.2}, {"time": 1747971233999, "temp": 36.1}, {"time": 1747971833908, "temp": 35.7}, {"time": 1747974239438, "temp": 35.6}, {"time": 1747974834498, "temp": 37.3}, {"time": 1747975434936, "temp": 38.0}, {"time": 1747976034622, "temp": 40.2}, {"time": 1747976639145, "temp": 38.5}, {"time": 1747977836033, "temp": 36.1}, {"time": 1747978437627, "temp": 34.7}, {"time": 1747979036713, "temp": 33.5}, {"time": 1747979641751, "temp": 31.6}, {"time": 1747980236865, "temp": 30.1}, {"time": 1747980836713, "temp": 29.8}, {"time": 1747981436799, "temp": 30.1}, {"time": 1747982036796, "temp": 30.4}, {"time": 1747982641754, "temp": 30.1}, {"time": 1747983236869, "temp": 29.4}, {"time": 1747983836789, "temp": 28.5}, {"time": 1747984436712, "temp": 27.6}, {"time": 1747985036706, "temp": 26.6}, {"time": 1747986837366, "temp": 25.2}, {"time": 1747988038507, "temp": 25.1}, {"time": 1747990439357, "temp": 25.4}, {"time": 1747992261538, "temp": 24.7}, {"time": 1747995839654, "temp": 23.3}, {"time": 1747997039056, "temp": 23.0}, {"time": 1747997644500, "temp": 22.3}, {"time": 1747998239054, "temp": 22.4}, {"time": 1747998840533, "temp": 22.1}, {"time": 1747999440440, "temp": 22.2}, {"time": 1748002445613, "temp": 21.1}, {"time": 1748004841402, "temp": 21.5}, {"time": 1748008441039, "temp": 20.0}, {"time": 1748009041203, "temp": 19.7}, {"time": 1748009640818, "temp": 20.4}, {"time": 1748010256991, "temp": 20.6} ]};
+
+            try {
+                const response = await fetch('parsedTemperatures.json');
+                const data = await response.json();
+
+                // 時間を日付形式に変換してソート
+                const sortedData = data.temperatures.sort((a, b) => a.time - b.time);
+
+                // 日付ごとにデータを分ける
+                const dataByDate = {};
+                
+                sortedData.forEach(item => {
+                    const date = new Date(item.time);
+                    const dateKey = date.toLocaleDateString('ja-JP');
+                    
+                    if (!dataByDate[dateKey]) {
+                        dataByDate[dateKey] = [];
+                    }
+                    
+                    dataByDate[dateKey].push({
+                        time: item.time,
+                        temp: item.temp,
+                        hour: date.getHours(),
+                        minutes: date.getMinutes()
+                    });
+                });
+
+                // 0時から23時までのラベルを作成
+                const hourLabels = Array.from({length: 24}, (_, i) => `${i}時`);
+                
+                // 各日付のデータセットを作成
+                const datasets = [];
+                const colors = ['#4ecdc4', '#ff6b6b', '#45b7d1', '#96ceb4', '#feca57'];
+                let colorIndex = 0;
+                
+                Object.keys(dataByDate).forEach(dateKey => {
+                    const dayData = dataByDate[dateKey];
+                    const hourlyTemps = Array.from({length: 24}, (_, targetHour) => {
+                        // 前の時間から現在の時間までのデータを検索
+                        const startTime = targetHour === 0 ? 0 : targetHour * 60; // 分に変換
+                        const endTime = (targetHour + 1) * 60; // 分に変換
+                        
+                        // 対象時間範囲内のデータを取得
+                        const candidates = dayData.filter(item => {
+                            const totalMinutes = item.hour * 60 + item.minutes;
+                            return totalMinutes > startTime && totalMinutes <= endTime;
+                        });
+                        
+                        if (candidates.length === 0) {
+                            return null; // データがない場合は null
+                        }
+                        
+                        // 目標時刻（例：2時なら2:00）に最も近い（かつ直前の）データを選択
+                        const targetMinutes = endTime; // 目標時刻（分）
+                        let closestData = null;
+                        let minDistance = Infinity;
+                        
+                        candidates.forEach(item => {
+                            const itemMinutes = item.hour * 60 + item.minutes;
+                            const distance = targetMinutes - itemMinutes;
+                            
+                            // 直前のデータのみを考慮（distance > 0）し、最も近いものを選択
+                            if (distance > 0 && distance < minDistance) {
+                                minDistance = distance;
+                                closestData = item;
+                            }
+                        });
+                        
+                        return closestData ? closestData.temp : null;
+                    });
+                    
+                    datasets.push({
+                        label: `${dateKey}の温度 (°C)`,
+                        data: hourlyTemps,
+                        backgroundColor: colors[colorIndex % colors.length] + '80', // 透明度を追加
+                        borderColor: colors[colorIndex % colors.length],
+                        borderWidth: 2
+                    });
+                    
+                    colorIndex++;
+                });
+
+                createChart(hourLabels, datasets);
+
+                // 情報表示を更新
+                const dateCount = Object.keys(dataByDate).length;
+                const totalDataPoints = sortedData.length;
+                document.getElementById('mytemp-info').textContent =
+                    `対象日数: ${dateCount}日 | 総データ点数: ${totalDataPoints}個`;
+
+                // 時刻別温度のテーブル表示
+                const tableBody = document.getElementById('mytemp-table-body');
+                tableBody.innerHTML = ''; // テーブルをクリア
+                sortedData.forEach((item, index) => {
+                    const date = new Date(item.time);
+                    const row = document.createElement('tr');
+                    
+                    // 1時間おき（分が00に近い）かどうかを判定
+                    const isHourMark = date.getMinutes() === 0 || 
+                                      (index > 0 && Math.abs(date.getMinutes() - 0) < 5);
+                    
+                    if (isHourMark) {
+                        row.classList.add('hour-mark');
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${date.toLocaleString('ja-JP', { 
+                            month: '2-digit', 
+                            day: '2-digit', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                        })}</td>
+                        <td>${item.temp} °C</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('データの読み込みに失敗しました:', error);
+                document.getElementById('mytemp-info').textContent =
+                    'データの読み込みに失敗しました。parsedTemperatures.jsonファイルを確認してください。';
+            }
+            
+        }
+
+        function createChart(labels, datasets) {
+            const ctx = document.getElementById('mytemp-chart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets.map((dataset, index) => ({
+                        ...dataset,
+                        spanGaps: true,  // データがない区間でも線を繋ぐ
+                        tension: 0.1,    // 線を滑らかにする
+                        pointRadius: 3,  // ポイントのサイズ
+                        pointHoverRadius: 5,  // ホバー時のポイントサイズ
+                        fill: false,     // 塗りつぶしを無効にして線グラフに
+                        order: datasets.length - index - 1  // 後の日付を手前、前の日付を背面に
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '時間',
+                                color: '#666'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '温度 (°C)',
+                                color: '#666'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function (context) {
+                                    if (context.parsed.y === null) {
+                                        return `${context.dataset.label}: データなし`;
+                                    }
+                                    return `${context.dataset.label}: ${context.parsed.y}°C`;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
+                    elements: {
+                        line: {
+                            spanGaps: true  // 線要素レベルでも設定
+                        }
+                    }
+                }
+            });
+        }
+
+        // ページ読み込み時にデータを読み込む
+        document.addEventListener('DOMContentLoaded', loadTemperatureData);
+    </script>
+</body>
+
+</html>
