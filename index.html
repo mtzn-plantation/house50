@@ -220,7 +220,7 @@
                 // 時刻別温度のテーブル表示
                 const tableBody = document.getElementById('mytemp-table-body');
                 tableBody.innerHTML = ''; // テーブルをクリア
-                sortedData.forEach((item, index) => {
+                [...sortedData].reverse().forEach((item, index) => {
                     const date = new Date(item.time);
                     const row = document.createElement('tr');
                     
