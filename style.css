@@ -70,14 +70,14 @@
 
 /* 1時間おきの行のスタイル */
 .mytemp-table tr.hour-mark {
-  border-top: 3px solid #007bff;
-  background-color: #f8f9ff;
+  border-bottom: 3px solid #007bff;
+  /* background-color: #f8f9ff; */
 }
 
-.mytemp-table tr.hour-mark td {
+/* .mytemp-table tr.hour-mark td {
   font-weight: bold;
   color: #0056b3;
-}
+} */
 
 .mytemp-table tr.hour-mark:hover {
   background-color: #e6f3ff;
