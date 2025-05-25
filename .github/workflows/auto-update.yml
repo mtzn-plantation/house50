@@ -34,8 +34,8 @@ jobs:
           SORACOM_API_ID=$(echo "$SORACOM_TOKEN_JSON" | jq -r '.apiKey')
           # SORACOM APIでSIMデータを取得
           echo "step: get sim data"
-          # 前日の0時のタイムスタンプを取得
-          from=$(date -d "yesterday 00:00" +%s)000
+          # 前日の0時(JST)のタイムスタンプを取得
+          from=$(date -d "yesterday 00:00 JST" +%s)000
           # 現在時刻のタイムスタンプを取得
           to=$(date +%s)000
           SIM_DATA=$(curl -s -X GET "https://api.soracom.io/v1/sims/$SIM_ID/data?from=$from&to=$to&limit=288&sort=asc" \
@@ -87,12 +87,12 @@ jobs:
           #     {"time": 1716710400000, "temp": 24.8}
           #   ]
           # }
-          echo "$json_output" > temperatures.json
+          echo "$json_output" > src/temperatures.json
           # temperatures.jsonをGitHubにpushする
           echo "step: git push"
           git config --local user.name "mitsuzono"
           git config --local user.email "mitsuzono@users.noreply.github.com"
-          git add temperatures.json
+          git add src/temperatures.json
           git commit -m "Update temperatures.json"
           # GITHUB_TOKENを使用してリモートリポジトリにpush
           git push https://$GITHUB_TOKEN@github.com/$REPO_OWNER/$REPO_NAME.git main
