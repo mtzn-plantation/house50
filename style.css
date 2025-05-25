@@ -1,0 +1,90 @@
+.mytemp-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.mytemp-title {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.mytemp-chart-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.mytemp-chart {
+  max-width: 100%;
+  height: 400px;
+}
+
+.mytemp-info {
+  text-align: center;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  color: #666;
+}
+
+.mytemp-table {
+  margin-top: 20px;
+}
+
+.mytemp-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mytemp-table th,
+.mytemp-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 24px;
+}
+
+.mytemp-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+}
+
+.mytemp-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.mytemp-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* 1時間おきの行のスタイル */
+.mytemp-table tr.hour-mark {
+  border-top: 3px solid #007bff;
+  background-color: #f8f9ff;
+}
+
+.mytemp-table tr.hour-mark td {
+  font-weight: bold;
+  color: #0056b3;
+}
+
+.mytemp-table tr.hour-mark:hover {
+  background-color: #e6f3ff;
+}
+
+body {
+  background: #f0f2f5;
+  margin: 0;
+  padding: 0;
+}
