@@ -34,8 +34,8 @@ jobs:
           SORACOM_API_ID=$(echo "$SORACOM_TOKEN_JSON" | jq -r '.apiKey')
           # SORACOM APIでSIMデータを取得
           echo "step: get sim data"
-          # 前日の0時のタイムスタンプを取得
-          from=$(date -d "yesterday 00:00" +%s)000
+          # 前日の0時(JST)のタイムスタンプを取得
+          from=$(date -d "yesterday 00:00 JST" +%s)000
           # 現在時刻のタイムスタンプを取得
           to=$(date +%s)000
           SIM_DATA=$(curl -s -X GET "https://api.soracom.io/v1/sims/$SIM_ID/data?from=$from&to=$to&limit=288&sort=asc" \
