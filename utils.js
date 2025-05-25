@@ -115,6 +115,12 @@ async function loadTemperatureData(json) {
       tableBody.appendChild(row);
     });
 
+    // 最新のバッテリー残量を取得し、mytemp-batteryに表示
+    const latestBattery = sortedData[sortedData.length - 1].bat;
+    // バッテリー残量テキストの設定
+    document.getElementById('mytemp-battery').textContent =
+      `最新のバッテリー残量: ${latestBattery}`;
+
   } catch (error) {
     console.error('データの読み込みに失敗しました:', error);
     document.getElementById('mytemp-info').textContent =
