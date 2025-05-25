@@ -90,12 +90,17 @@ jobs:
           echo "$json_output" > temperatures.json
           # temperatures.jsonをGitHubにpushする
           echo "step: git push"
-          git config --local user.name "mitsuzono"
-          git config --local user.email "mitsuzono@users.noreply.github.com"
-          git add temperatures.json
-          git commit -m "Update temperatures.json"
-          # GITHUB_TOKENを使用してリモートリポジトリにpush
-          git push https://$GITHUB_TOKEN@github.com/$REPO_OWNER/$REPO_NAME.git main
+          # temperatures.jsonに変更があった場合のみcommitとpushを行う
+          if git diff --name-only | grep -q "temperatures.json" || [ ! -f temperatures.json ]; then
+            git config --local user.name "mitsuzono"
+            git config --local user.email "mitsuzono@users.noreply.github.com"
+            git add temperatures.json
+            git commit -m "Update temperatures.json"
+            # GITHUB_TOKENを使用してリモートリポジトリにpush
+            git push https://$GITHUB_TOKEN@github.com/$REPO_OWNER/$REPO_NAME.git main
+          else
+            echo "No changes detected in temperatures.json, skipping commit and push."
+          fi
           echo "step: completed"
         env:
           SORACOM_AUTH_KEY_ID: ${{ secrets.SORACOM_AUTH_KEY_ID }}
